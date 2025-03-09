@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-dark-950 via-dark-900 to-dark-800 text-gray-100 min-h-screen;
+  }
+}
+
+.glass {
+  @apply bg-dark-800/30 backdrop-blur-glass border border-dark-700/50;
+}
+
+.glass-card {
+  @apply glass hover:bg-dark-800/40 transition-all duration-300;
+}
+
+.glass-hover {
+  @apply hover:bg-dark-800/40 transition-all duration-300;
+}
