@@ -3,9 +3,41 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-gradient-to-br from-dark-950 via-dark-900 to-dark-800 text-gray-100 min-h-screen;
+  html {
+    scroll-behavior: smooth;
   }
+
+  body {
+    @apply bg-dark-950 text-gray-100 min-h-screen font-sans;
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(163, 116, 255, 0.12), transparent 40%),
+      radial-gradient(circle at 85% 20%, rgba(34, 211, 238, 0.08), transparent 40%),
+      linear-gradient(to bottom, #08091a, #121426 40%, #08091a);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background-color: rgba(245, 185, 66, 0.35);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #08091a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #383c5e;
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4c5078;
+  }
+}
+
+.font-display {
+  font-family: 'Orbitron', sans-serif;
 }
 
 .glass {
@@ -13,9 +45,17 @@
 }
 
 .glass-card {
-  @apply glass hover:bg-dark-800/40 transition-all duration-300;
+  @apply glass hover:bg-dark-800/50 transition-all duration-300;
 }
 
 .glass-hover {
   @apply hover:bg-dark-800/40 transition-all duration-300;
+}
+
+.text-gradient-xp {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-xp-400 via-xp-500 to-xp-600;
+}
+
+.text-gradient-ai {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-ai-400 via-ai-500 to-tools-400;
 }
