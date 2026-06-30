@@ -28,7 +28,8 @@ export const skillGroups: SkillGroup[] = [
     items: [
       { name: 'FastAPI', level: 88 },
       { name: 'Docker', level: 82 },
-      { name: 'Streamlit', level: 85 },
+      { name: 'LangChain', level: 86 },
+      { name: 'LangGraph', level: 80 },
       { name: 'Git / GitHub', level: 95 },
       { name: 'Linux / Shell', level: 85 },
     ],
