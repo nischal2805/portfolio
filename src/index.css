@@ -3,59 +3,72 @@
 @tailwind utilities;
 
 @layer base {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+
   html {
     scroll-behavior: smooth;
+    background: #060606;
   }
 
   body {
-    @apply bg-dark-950 text-gray-100 min-h-screen font-sans;
-    background-image:
-      radial-gradient(circle at 15% 0%, rgba(163, 116, 255, 0.12), transparent 40%),
-      radial-gradient(circle at 85% 20%, rgba(34, 211, 238, 0.08), transparent 40%),
-      linear-gradient(to bottom, #08091a, #121426 40%, #08091a);
-    background-attachment: fixed;
+    @apply bg-ink-950 text-ink-100 min-h-screen font-sans;
+    overflow-x: hidden;
   }
 
   ::selection {
-    background-color: rgba(245, 185, 66, 0.35);
+    background-color: rgba(0, 255, 65, 0.25);
     color: #fff;
   }
 
-  ::-webkit-scrollbar {
-    width: 10px;
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #242424; }
+}
+
+@layer components {
+  .signal-text {
+    color: #00FF41;
   }
-  ::-webkit-scrollbar-track {
-    background: #08091a;
+
+  .signal-border {
+    border-color: rgba(0, 255, 65, 0.2);
   }
-  ::-webkit-scrollbar-thumb {
-    background: #383c5e;
-    border-radius: 8px;
+
+  .signal-bg {
+    background-color: rgba(0, 255, 65, 0.06);
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #4c5078;
+
+  .signal-glow {
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.35), 0 0 60px rgba(0, 255, 65, 0.1);
+  }
+
+  .text-signal {
+    color: #00FF41;
+  }
+
+  /* clip-path reveal used by Hero */
+  .reveal-clip {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+  }
+  .reveal-clip.visible {
+    animation: reveal-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .skill-bar-track {
+    @apply h-px bg-ink-700 relative overflow-hidden;
+  }
+
+  .skill-bar-fill {
+    @apply h-full bg-signal absolute left-0 top-0 transition-all duration-700 ease-out;
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
   }
 }
 
-.font-display {
-  font-family: 'Orbitron', sans-serif;
-}
-
-.glass {
-  @apply bg-dark-800/30 backdrop-blur-glass border border-dark-700/50;
-}
-
-.glass-card {
-  @apply glass hover:bg-dark-800/50 transition-all duration-300;
-}
-
-.glass-hover {
-  @apply hover:bg-dark-800/40 transition-all duration-300;
-}
-
-.text-gradient-xp {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-xp-400 via-xp-500 to-xp-600;
-}
-
-.text-gradient-ai {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-ai-400 via-ai-500 to-tools-400;
+@keyframes reveal-up {
+  from { clip-path: inset(100% 0 0 0); opacity: 0; }
+  to   { clip-path: inset(0% 0 0 0);   opacity: 1; }
 }

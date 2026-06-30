@@ -1,15 +1,9 @@
-import { useAchievements } from '../context/AchievementsContext';
-
 export default function Footer() {
-  const { unlockedCount, totalCount } = useAchievements();
-
   return (
-    <footer className="py-8 glass">
-      <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-gray-500 text-sm">
-        <p>Built with React, Tailwind & react-three-fiber.</p>
-        <p className="font-mono text-xs text-gray-600">
-          Achievements unlocked: {unlockedCount}/{totalCount}
-        </p>
+    <footer className="px-6 md:px-16 py-8" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <span className="font-mono text-xs text-ink-600">© 2025 NISCHAL R E</span>
+        <span className="font-mono text-xs text-ink-700">Built with React · Three.js · Framer Motion</span>
       </div>
     </footer>
   );

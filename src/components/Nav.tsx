@@ -1,66 +1,96 @@
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Swords } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const LINKS = [
-  { href: '#origin', label: 'Origin Story' },
-  { href: '#skills', label: 'Skill Tree' },
-  { href: '#quests', label: 'Quest Log' },
-  { href: '#contact', label: 'Guild Hall' },
+  { href: '#lab', label: 'Lab' },
+  { href: '#about', label: 'About' },
+  { href: '#skills', label: 'Skills' },
+  { href: '#contact', label: 'Contact' },
 ];
 
 export default function Nav() {
+  const [visible, setVisible] = useState(true);
+  const [lastY, setLastY] = useState(0);
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      setVisible(y < 60 || y < lastY);
+      setLastY(y);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [lastY]);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 glass z-50">
-      <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-2 text-white font-display text-sm tracking-widest">
-          <Swords className="w-4 h-4 text-ai-400" />
+    <motion.nav
+      className="fixed top-0 left-0 right-0 z-50 mix-blend-normal"
+      animate={{ y: visible ? 0 : -80, opacity: visible ? 1 : 0 }}
+      transition={{ duration: 0.25, ease: 'easeInOut' }}
+    >
+      <div className="flex items-center justify-between px-6 py-5 max-w-7xl mx-auto">
+        <a href="#" className="font-mono text-sm text-signal tracking-widest">
           N.RE
         </a>
 
-        <ul className="hidden md:flex items-center space-x-7">
-          {LINKS.map((link) => (
-            <li key={link.href}>
-              <a href={link.href} className="text-sm text-gray-300 hover:text-white transition-colors">
-                {link.label}
+        <ul className="hidden md:flex items-center gap-8">
+          {LINKS.map(l => (
+            <li key={l.href}>
+              <a
+                href={l.href}
+                className="text-sm text-ink-300 hover:text-signal transition-colors duration-200 tracking-wide"
+              >
+                {l.label}
               </a>
             </li>
           ))}
         </ul>
 
-        <button
-          className="md:hidden text-gray-300 hover:text-white"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle navigation menu"
+        <a
+          href="mailto:nischalrellur2805@outlook.com"
+          className="hidden md:block text-sm font-mono text-ink-950 bg-signal px-4 py-1.5 hover:opacity-90 transition-opacity"
         >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          Hire me
+        </a>
+
+        <button
+          className="md:hidden text-ink-300 hover:text-signal"
+          onClick={() => setOpen(v => !v)}
+          aria-label="Toggle menu"
+        >
+          <div className="space-y-1.5">
+            <span className={`block w-5 h-px bg-current transition-all ${open ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block w-5 h-px bg-current transition-all ${open ? 'opacity-0' : ''}`} />
+            <span className={`block w-5 h-px bg-current transition-all ${open ? '-rotate-45 -translate-y-2' : ''}`} />
+          </div>
         </button>
       </div>
 
       <AnimatePresence>
         {open && (
-          <motion.ul
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden flex flex-col px-4 pb-4 gap-3 overflow-hidden"
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden bg-ink-900/95 backdrop-blur-sm overflow-hidden"
           >
-            {LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="text-sm text-gray-300 hover:text-white transition-colors block py-1"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </motion.ul>
+            <ul className="flex flex-col gap-4 px-6 py-6">
+              {LINKS.map(l => (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="text-ink-200 hover:text-signal transition-colors text-lg"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </motion.nav>
   );
 }

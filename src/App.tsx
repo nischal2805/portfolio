@@ -1,30 +1,23 @@
-import { AchievementsProvider } from './context/AchievementsContext';
+import Cursor from './components/Cursor';
 import Nav from './components/Nav';
-import XPBar from './components/XPBar';
-import AchievementToastStack from './components/AchievementToast';
-import HeroCharacterCard from './components/HeroCharacterCard';
-import OriginStory from './components/OriginStory';
-import SkillTree from './components/SkillTree';
-import QuestLog from './components/QuestLog';
-import GuildHall from './components/GuildHall';
+import Hero from './components/Hero';
+import Galaxy from './components/Galaxy';
+import About from './components/About';
+import Skills from './components/Skills';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 
-function App() {
+export default function App() {
   return (
-    <AchievementsProvider>
-      <div className="min-h-screen">
-        <XPBar />
-        <Nav />
-        <HeroCharacterCard />
-        <OriginStory />
-        <SkillTree />
-        <QuestLog />
-        <GuildHall />
-        <Footer />
-        <AchievementToastStack />
-      </div>
-    </AchievementsProvider>
+    <div className="bg-ink-950 min-h-screen">
+      <Cursor />
+      <Nav />
+      <Hero />
+      <Galaxy />
+      <About />
+      <Skills />
+      <Contact />
+      <Footer />
+    </div>
   );
 }
-
-export default App;
