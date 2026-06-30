@@ -81,7 +81,7 @@ export default function Contact() {
           className="mt-16 flex items-center gap-4"
         >
           <span className="w-2 h-2 rounded-full bg-signal animate-signal-pulse" />
-          <span className="font-mono text-xs text-ink-500">Open to internships and research roles · 2025</span>
+          <span className="font-mono text-xs text-ink-500">Open to internships and research roles · 2026</span>
         </motion.div>
       </div>
     </section>

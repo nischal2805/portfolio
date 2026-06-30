@@ -21,7 +21,6 @@ export const skillGroups: SkillGroup[] = [
       { name: 'RAG Systems', level: 85 },
       { name: 'Computer Vision', level: 88 },
       { name: 'NLP / Transformers', level: 85 },
-      { name: 'Reinforcement Learning', level: 70 },
     ],
   },
   {
@@ -32,7 +31,6 @@ export const skillGroups: SkillGroup[] = [
       { name: 'Streamlit', level: 85 },
       { name: 'Git / GitHub', level: 95 },
       { name: 'Linux / Shell', level: 85 },
-      { name: 'Kubernetes', level: 55 },
     ],
   },
 ];

@@ -11,8 +11,8 @@ export const projects: Project[] = [
     stack: ['PyTorch', 'EfficientNet-B4', 'CLIP', 'Grad-CAM', 'Streamlit'],
     stat: 'Target cross-dataset AUC > 0.85',
     link: 'https://github.com/nischal2805/DeepShield',
-    position: [-3.2, 0.6, 0.5],
-    scale: 1.3,
+    position: [-4.5, 0.7, 1.5],
+    scale: 1.4,
   },
   {
     id: 'accentshift',
@@ -24,8 +24,8 @@ export const projects: Project[] = [
     stack: ['PyTorch', 'FastAPI', 'Librosa', 'TypeScript', 'React'],
     stat: 'End-to-end pipeline with web demo',
     link: 'https://github.com/nischal2805/AccentShift',
-    position: [3.0, 0.2, -0.3],
-    scale: 1.3,
+    position: [4.5, 0.3, 1.5],
+    scale: 1.4,
   },
   {
     id: 'alzheimers',
@@ -37,8 +37,8 @@ export const projects: Project[] = [
     stack: ['TensorFlow', 'Keras', 'Grad-CAM', 'OpenCV', 'OASIS Dataset'],
     stat: '97.4% validation accuracy',
     link: 'https://github.com/nischal2805/alzheimer-detection',
-    position: [-2.8, -1.4, 1.8],
-    scale: 1.0,
+    position: [-4.0, -2.2, -0.5],
+    scale: 1.1,
   },
   {
     id: 'crimebert',
@@ -50,8 +50,8 @@ export const projects: Project[] = [
     stack: ['PyTorch', 'HuggingFace', 'BERT', 'Transformers', 'FastAPI'],
     stat: '57-class IPC classification',
     link: 'https://github.com/nischal2805/CrimeBERT',
-    position: [2.2, 1.6, 1.2],
-    scale: 1.0,
+    position: [3.5, 2.5, -0.5],
+    scale: 1.1,
   },
   {
     id: 'audiobook',
@@ -63,7 +63,7 @@ export const projects: Project[] = [
     stack: ['Python', 'ElevenLabs', 'LangChain', 'PyPDF2'],
     stat: 'Full-length audiobooks in minutes',
     link: 'https://github.com/nischal2805/AudioBook-Creator',
-    position: [-1.2, 2.0, -2.2],
+    position: [-2.0, 3.5, -2.5],
     scale: 0.85,
   },
   {
@@ -76,7 +76,7 @@ export const projects: Project[] = [
     stack: ['Python', 'OpenAI Gym', 'PyTorch', 'NetworkX'],
     stat: 'Outperforms Dijkstra under congestion',
     link: 'https://github.com/nischal2805/rl-network-routing',
-    position: [3.8, -1.2, 0.8],
+    position: [5.0, -1.8, -1.0],
     scale: 0.85,
   },
   {
@@ -89,7 +89,7 @@ export const projects: Project[] = [
     stack: ['Python', 'Claude API', 'NLP', 'Gen AI'],
     stat: 'Emotional context layer over financial data',
     link: 'https://github.com/nischal2805/financial-ai-assistant',
-    position: [-3.8, -0.4, -1.8],
+    position: [-5.0, -0.8, -2.0],
     scale: 0.85,
   },
   {
@@ -102,7 +102,7 @@ export const projects: Project[] = [
     stack: ['TensorFlow', 'OpenCV', 'Scikit-Learn', 'Pandas'],
     stat: 'District-level yield forecasting',
     link: 'https://github.com/nischal2805/crop-yield-prediction',
-    position: [1.2, -2.2, -1.0],
+    position: [2.0, -3.5, -1.5],
     scale: 0.85,
   },
   {
@@ -115,7 +115,20 @@ export const projects: Project[] = [
     stack: ['SolidWorks', 'MATLAB', 'Python'],
     stat: 'DO-178C compliance reference',
     link: 'https://github.com/nischal2805/flight-part-simulator',
-    position: [-0.6, 1.0, 3.0],
+    position: [-1.0, 1.5, -4.5],
+    scale: 0.85,
+  },
+  {
+    id: 'pods-experiment',
+    name: 'PodsExperiment',
+    tier: 'side',
+    tagline: 'Containerised. Isolated. Reproducible.',
+    description:
+      'An experiment in containerised ML model lifecycle management — each training run spawns a dedicated Python pod with pinned dependencies and isolated GPU allocation. A lightweight FastAPI orchestrator dispatches jobs, streams logs, and stores artifacts, making experiments fully reproducible without environment drift.',
+    stack: ['Python', 'Docker', 'FastAPI', 'PyTorch', 'MLflow'],
+    stat: 'Fully reproducible ML runs via pod isolation',
+    link: 'https://github.com/nischal2805/pods-experiment',
+    position: [2.2, 3.0, -3.5],
     scale: 0.85,
   },
 ];

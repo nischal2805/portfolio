@@ -8,11 +8,13 @@ import { projects } from '../data/projects';
 import PodMesh from './PodMesh';
 import ProjectPanel from './ProjectPanel';
 
+// Constellation wiring between pods
 const CONNECTION_PAIRS = [
-  [0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6], [5, 7], [6, 8], [1, 5], [0, 4],
+  [0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6],
+  [5, 7], [6, 8], [7, 9], [8, 1], [0, 5], [1, 6], [3, 9],
 ];
 
-function ConstellationLines({ selected }: { selected: Project | null }) {
+function ConstellationLines({ dimmed }: { dimmed: boolean }) {
   return (
     <>
       {CONNECTION_PAIRS.map(([a, b], i) => {
@@ -24,9 +26,9 @@ function ConstellationLines({ selected }: { selected: Project | null }) {
             key={i}
             points={[new THREE.Vector3(...pa), new THREE.Vector3(...pb)]}
             color="#00FF41"
-            lineWidth={0.4}
+            lineWidth={0.35}
             transparent
-            opacity={selected ? 0.06 : 0.12}
+            opacity={dimmed ? 0.05 : 0.1}
           />
         );
       })}
@@ -34,14 +36,21 @@ function ConstellationLines({ selected }: { selected: Project | null }) {
   );
 }
 
-function Rig() {
-  const groupRef = useRef<THREE.Group>(null);
+function AmbientPulse() {
+  const meshRef = useRef<THREE.Mesh>(null);
   useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.08) * 0.15;
-    }
+    if (!meshRef.current) return;
+    const t = state.clock.elapsedTime;
+    meshRef.current.scale.setScalar(1 + Math.sin(t * 0.4) * 0.06);
+    (meshRef.current.material as THREE.MeshBasicMaterial).opacity =
+      0.018 + Math.sin(t * 0.4) * 0.006;
   });
-  return <group ref={groupRef} />;
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[7, 24, 24]} />
+      <meshBasicMaterial color="#00FF41" transparent opacity={0.018} side={THREE.BackSide} depthWrite={false} />
+    </mesh>
+  );
 }
 
 export default function Galaxy() {
@@ -56,7 +65,7 @@ export default function Galaxy() {
       {/* Section label */}
       <div className="absolute top-8 left-8 z-10 pointer-events-none">
         <p className="font-mono text-xs text-signal tracking-widest mb-1">// PROJECT LAB</p>
-        <p className="text-ink-500 text-xs font-mono">Drag to orbit · Click a pod</p>
+        <p className="text-ink-500 text-xs font-mono">Drag to orbit · Click a pod to expand</p>
       </div>
 
       {/* Pod count */}
@@ -64,27 +73,28 @@ export default function Galaxy() {
         <p className="font-mono text-xs text-ink-500">{projects.length} systems</p>
       </div>
 
-      {/* Canvas */}
+      {/* Canvas — zoom disabled so wheel scrolls the page */}
       <Canvas
-        camera={{ position: [0, 1.5, 9], fov: 55 }}
+        camera={{ position: [0, 1.5, 11], fov: 55 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
         onPointerMissed={() => setSelected(null)}
       >
-        <ambientLight intensity={0.05} />
-        <pointLight position={[0, 0, 0]} color="#00FF41" intensity={0.3} distance={12} />
+        <ambientLight intensity={0.04} />
+        <pointLight position={[0, 0, 0]} color="#00FF41" intensity={0.25} distance={14} />
 
         <Suspense fallback={null}>
           <Sparkles
-            count={220}
-            scale={[18, 10, 14]}
-            size={0.8}
-            speed={0.15}
+            count={280}
+            scale={[22, 12, 18]}
+            size={0.7}
+            speed={0.12}
             color="#00FF41"
-            opacity={0.25}
+            opacity={0.2}
           />
 
-          <ConstellationLines selected={selected} />
+          <AmbientPulse />
+          <ConstellationLines dimmed={!!selected} />
 
           {projects.map(p => (
             <PodMesh
@@ -98,38 +108,35 @@ export default function Galaxy() {
 
         <OrbitControls
           enablePan={false}
-          enableZoom={true}
-          minDistance={5}
-          maxDistance={16}
-          maxPolarAngle={Math.PI * 0.7}
-          minPolarAngle={Math.PI * 0.2}
+          enableZoom={false}
+          maxPolarAngle={Math.PI * 0.72}
+          minPolarAngle={Math.PI * 0.18}
           autoRotate={!selected}
-          autoRotateSpeed={0.4}
+          autoRotateSpeed={0.35}
         />
-        <Rig />
       </Canvas>
 
-      {/* Dim overlay when panel open */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-ink-950/60 pointer-events-none z-10"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Project detail panel */}
+      {/* Project detail panel (has its own backdrop) */}
       <AnimatePresence>
         {selected && (
           <ProjectPanel project={selected} onClose={() => setSelected(null)} />
         )}
       </AnimatePresence>
 
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-ink-950 to-transparent pointer-events-none z-10" />
+      {/* Bottom fade to next section */}
+      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-ink-950 to-transparent pointer-events-none z-10" />
+
+      {/* Scroll hint */}
+      {!selected && (
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 pointer-events-none flex flex-col items-center gap-1.5">
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+            className="w-px h-6 bg-gradient-to-b from-signal to-transparent opacity-40"
+          />
+          <span className="font-mono text-xs text-ink-600 tracking-widest">SCROLL</span>
+        </div>
+      )}
     </section>
   );
 }
