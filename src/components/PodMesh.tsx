@@ -110,7 +110,7 @@ export default function PodMesh({ project, onClick, selected, dimmed }: PodMeshP
         {/* Main icosahedron */}
         <mesh
           ref={meshRef}
-          scale={selected ? 1.18 : hovered && !dimmed ? 1.07 : 1}
+          scale={selected ? 1.65 : hovered && !dimmed ? 1.08 : 1}
         >
           <icosahedronGeometry args={[s * 0.72, 1]} />
           <meshStandardMaterial

@@ -8,7 +8,7 @@ export const projects: Project[] = [
     tagline: 'Can you still tell what\'s real?',
     description:
       'Dual-track deepfake & AI-image detector. Faces run through an EfficientNet-B4 + SBI ensemble; generated images checked against C2PA metadata and Google SynthID watermarks. Grad-CAM heatmaps show exactly which pixels triggered the verdict.',
-    stack: ['PyTorch', 'EfficientNet-B4', 'CLIP', 'Grad-CAM', 'Streamlit'],
+    stack: ['PyTorch', 'EfficientNet-B4', 'CLIP', 'Grad-CAM', 'FastAPI'],
     stat: 'Target cross-dataset AUC > 0.85',
     link: 'https://github.com/nischal2805/DeepShield',
     position: [-4.2, 0.8, 1.2],

@@ -6,12 +6,12 @@ import * as THREE from 'three';
 import { Project } from '../types';
 import { projects } from '../data/projects';
 import PodMesh from './PodMesh';
+import PodExpanded from './PodExpanded';
 import ProjectPanel from './ProjectPanel';
 
-// Constellation wiring for 8 pods
 const CONNECTION_PAIRS = [
   [0, 1], [0, 2], [1, 2], [0, 3], [1, 4],
-  [2, 5], [3, 6], [4, 7], [5, 7], [3, 5], [4, 6],
+  [2, 5], [3, 6], [4, 7], [5, 7], [3, 5],
 ];
 
 function ConstellationLines({ dimmed }: { dimmed: boolean }) {
@@ -29,7 +29,7 @@ function ConstellationLines({ dimmed }: { dimmed: boolean }) {
             color="#00FF41"
             lineWidth={0.3}
             transparent
-            opacity={dimmed ? 0.04 : 0.08}
+            opacity={dimmed ? 0.03 : 0.08}
           />
         );
       })}
@@ -37,39 +37,35 @@ function ConstellationLines({ dimmed }: { dimmed: boolean }) {
   );
 }
 
-// Stark HUD — radar sweep ring
 function RadarSweep() {
-  const ringRef = useRef<THREE.Mesh>(null);
+  const ref = useRef<THREE.Mesh>(null);
   useFrame((state) => {
-    if (!ringRef.current) return;
-    const cycle = (state.clock.elapsedTime * 0.18) % 1;
-    const r = cycle * 14;
-    ringRef.current.scale.setScalar(r < 0.1 ? 0.01 : r);
-    const mat = ringRef.current.material as THREE.MeshBasicMaterial;
-    mat.opacity = r < 0.5 ? 0 : Math.max(0, 0.12 * (1 - cycle));
+    if (!ref.current) return;
+    const cycle = (state.clock.elapsedTime * 0.16) % 1;
+    ref.current.scale.setScalar(Math.max(0.01, cycle * 15));
+    (ref.current.material as THREE.MeshBasicMaterial).opacity =
+      cycle < 0.05 ? 0 : Math.max(0, 0.09 * (1 - cycle));
   });
   return (
-    <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
+    <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
       <ringGeometry args={[0.94, 1, 64]} />
       <meshBasicMaterial color="#00FF41" transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
 
-// Ambient green breathing sphere
 function AmbientPulse() {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const ref = useRef<THREE.Mesh>(null);
   useFrame((state) => {
-    if (!meshRef.current) return;
+    if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    meshRef.current.scale.setScalar(1 + Math.sin(t * 0.35) * 0.05);
-    (meshRef.current.material as THREE.MeshBasicMaterial).opacity =
-      0.016 + Math.sin(t * 0.35) * 0.005;
+    ref.current.scale.setScalar(1 + Math.sin(t * 0.35) * 0.05);
+    (ref.current.material as THREE.MeshBasicMaterial).opacity = 0.015 + Math.sin(t * 0.35) * 0.005;
   });
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={ref}>
       <sphereGeometry args={[8, 24, 24]} />
-      <meshBasicMaterial color="#00FF41" transparent opacity={0.016} side={THREE.BackSide} depthWrite={false} />
+      <meshBasicMaterial color="#00FF41" transparent opacity={0.015} side={THREE.BackSide} depthWrite={false} />
     </mesh>
   );
 }
@@ -77,23 +73,26 @@ function AmbientPulse() {
 export default function Galaxy() {
   const [selected, setSelected] = useState<Project | null>(null);
 
+  const toggle = (p: Project) => setSelected(prev => prev?.id === p.id ? null : p);
+  const close = () => setSelected(null);
+
   return (
     <section id="lab" className="relative w-full" style={{ height: '100vh' }}>
-      {/* HUD label */}
+      {/* HUD labels */}
       <div className="absolute top-8 left-8 z-10 pointer-events-none">
         <p className="font-mono text-xs text-signal tracking-widest mb-1">// PROJECT LAB</p>
-        <p className="text-ink-500 text-xs font-mono">Drag to orbit · Click a pod to expand</p>
+        <p className="font-mono text-xs text-ink-500">Drag to orbit · Click a pod</p>
       </div>
-      <div className="absolute top-8 right-8 z-10 pointer-events-none text-right">
+      <div className="absolute top-8 right-8 z-10 pointer-events-none">
         <p className="font-mono text-xs text-ink-600 tracking-widest">{projects.length} SYSTEMS ONLINE</p>
       </div>
 
-      {/* Canvas — zoom disabled; wheel scrolls the page */}
+      {/* 3D Canvas */}
       <Canvas
         camera={{ position: [0, 1.5, 11], fov: 55 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
-        onPointerMissed={() => setSelected(null)}
+        onPointerMissed={close}
       >
         <ambientLight intensity={0.04} />
         <pointLight position={[0, 0, 0]} color="#00FF41" intensity={0.2} distance={16} />
@@ -108,11 +107,14 @@ export default function Galaxy() {
             <PodMesh
               key={p.id}
               project={p}
-              onClick={proj => setSelected(prev => prev?.id === proj.id ? null : proj)}
+              onClick={toggle}
               selected={selected?.id === p.id}
               dimmed={!!selected && selected.id !== p.id}
             />
           ))}
+
+          {/* Moon orbs emerge in 3D when pod selected */}
+          {selected && <PodExpanded key={selected.id} project={selected} />}
         </Suspense>
 
         <OrbitControls
@@ -125,15 +127,31 @@ export default function Galaxy() {
         />
       </Canvas>
 
-      {/* Project detail panel */}
+      {/* Dim overlay when panel open */}
       <AnimatePresence>
         {selected && (
-          <ProjectPanel project={selected} onClose={() => setSelected(null)} />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 pointer-events-none z-20"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)' }}
+          />
         )}
       </AnimatePresence>
 
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-ink-950 to-transparent pointer-events-none z-10" />
+      {/* Bottom-sheet HUD panel */}
+      <AnimatePresence>
+        {selected && (
+          <ProjectPanel project={selected} onClose={close} />
+        )}
+      </AnimatePresence>
+
+      {/* Bottom fade (only when no panel) */}
+      {!selected && (
+        <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-ink-950 to-transparent pointer-events-none z-10" />
+      )}
 
       {/* Scroll hint */}
       {!selected && (
