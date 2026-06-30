@@ -13,5 +13,5 @@ export interface Project {
 
 export interface SkillGroup {
   category: string;
-  items: { name: string; level: number }[];
+  items: string[];
 }
