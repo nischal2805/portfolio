@@ -6,115 +6,134 @@ interface Props {
   onClose: () => void;
 }
 
+const TIER_COLOR: Record<string, string> = {
+  flagship: '#00FF41',
+  major: '#00C830',
+  side: '#666666',
+};
+
 export default function ProjectPanel({ project, onClose }: Props) {
   return (
     <>
-      {/* Blurred backdrop — click to close */}
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
+        transition={{ duration: 0.2 }}
         className="absolute inset-0 z-20"
-        style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
+        style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(8px) saturate(0.5)' }}
         onClick={onClose}
       />
 
-      {/* Centered card */}
-      <div className="absolute inset-0 z-30 flex items-center justify-center p-4 md:p-8 pointer-events-none">
+      {/* Panel */}
+      <div className="absolute inset-0 z-30 flex items-center justify-center p-4 md:p-10 pointer-events-none">
         <motion.div
-          initial={{ opacity: 0, scale: 0.86, y: 28 }}
+          initial={{ opacity: 0, scale: 0.84, y: 32 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.92, y: 16 }}
-          transition={{ type: 'spring', stiffness: 340, damping: 32, mass: 0.8 }}
-          className="relative w-full max-w-lg pointer-events-auto overflow-hidden"
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28, mass: 0.9 }}
+          className="relative w-full pointer-events-auto"
           style={{
-            background: 'rgba(6,6,6,0.98)',
-            border: '1px solid rgba(0,255,65,0.2)',
-            boxShadow: '0 0 80px rgba(0,255,65,0.06), 0 0 0 1px rgba(0,255,65,0.05) inset',
-            maxHeight: '88vh',
+            maxWidth: 680,
+            maxHeight: '90vh',
             overflowY: 'auto',
+            background: 'rgba(5,5,5,0.99)',
+            border: '1px solid rgba(0,255,65,0.18)',
+            boxShadow: '0 0 100px rgba(0,255,65,0.05), 0 24px 80px rgba(0,0,0,0.8)',
           }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
-          {/* Signal bar top */}
+          {/* Top signal bar */}
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ delay: 0.1, duration: 0.5, ease: 'easeOut' }}
-            className="h-0.5 origin-left"
-            style={{ background: 'linear-gradient(90deg, #00FF41, #00C830 60%, transparent)' }}
+            transition={{ delay: 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="h-px origin-left"
+            style={{ background: 'linear-gradient(90deg, #00FF41 0%, #00C830 50%, transparent 100%)' }}
           />
 
-          <div className="px-7 pt-7 pb-8">
-            {/* Close */}
-            <button
-              onClick={onClose}
-              className="absolute top-5 right-5 w-7 h-7 flex items-center justify-center text-ink-500 hover:text-signal transition-colors font-mono text-xs border border-transparent hover:border-signal-border"
-            >
-              ✕
-            </button>
+          {/* HUD corner — top right */}
+          <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-signal opacity-40 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-signal opacity-20 pointer-events-none" />
 
-            {/* Name */}
-            <motion.h2
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12, duration: 0.4 }}
-              className="font-display font-bold text-white mb-1.5 pr-8"
-              style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', lineHeight: 1.05 }}
-            >
-              {project.name}
-            </motion.h2>
+          <div className="px-8 md:px-10 pt-8 pb-10">
+            {/* Header row */}
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div className="flex-1 min-w-0">
+                {/* System ID */}
+                <p className="font-mono text-xs text-ink-600 tracking-[0.2em] mb-2">
+                  // SYS·{project.id.toUpperCase()}
+                </p>
+                <h2
+                  className="font-display font-bold text-white leading-none"
+                  style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}
+                >
+                  {project.name}
+                </h2>
+                <p
+                  className="mt-2 text-sm italic"
+                  style={{ color: TIER_COLOR[project.tier] }}
+                >
+                  {project.tagline}
+                </p>
+              </div>
 
-            {/* Tagline */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.18, duration: 0.4 }}
-              className="text-signal text-sm italic mb-5"
-            >
-              {project.tagline}
-            </motion.p>
+              {/* Close */}
+              <button
+                onClick={onClose}
+                className="shrink-0 w-8 h-8 flex items-center justify-center font-mono text-xs text-ink-500 hover:text-signal border border-transparent hover:border-signal-border transition-all"
+              >
+                ✕
+              </button>
+            </div>
 
             {/* Divider */}
-            <div className="h-px mb-5" style={{ background: 'rgba(0,255,65,0.12)' }} />
+            <div className="mb-6" style={{ height: 1, background: 'rgba(0,255,65,0.1)' }} />
 
             {/* Description */}
             <motion.p
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.22, duration: 0.4 }}
-              className="text-ink-300 text-sm leading-relaxed mb-5"
+              transition={{ delay: 0.15, duration: 0.45 }}
+              className="text-ink-300 leading-relaxed mb-6"
+              style={{ fontSize: '0.9375rem' }}
             >
               {project.description}
             </motion.p>
 
-            {/* Stat */}
+            {/* Stat callout */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.28, duration: 0.4 }}
-              className="flex items-start gap-3 mb-5 px-4 py-3"
-              style={{ background: 'rgba(0,255,65,0.05)', border: '1px solid rgba(0,255,65,0.1)' }}
+              transition={{ delay: 0.22, duration: 0.4 }}
+              className="flex items-center gap-3 mb-8 px-5 py-4"
+              style={{
+                background: 'rgba(0,255,65,0.04)',
+                border: '1px solid rgba(0,255,65,0.12)',
+                borderLeft: '3px solid #00FF41',
+              }}
             >
-              <span className="text-signal font-mono text-xs mt-0.5 shrink-0">▸</span>
-              <span className="font-mono text-xs text-signal">{project.stat}</span>
+              <span className="font-mono text-sm text-signal">{project.stat}</span>
             </motion.div>
 
             {/* Stack */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32, duration: 0.4 }}
-              className="mb-7"
+              transition={{ delay: 0.28, duration: 0.4 }}
+              className="mb-8"
             >
-              <p className="font-mono text-xs text-ink-600 tracking-widest mb-2.5">STACK</p>
+              <p className="font-mono text-xs text-ink-600 tracking-[0.2em] mb-3">STACK</p>
               <div className="flex flex-wrap gap-2">
                 {project.stack.map(s => (
                   <span
                     key={s}
-                    className="font-mono text-xs px-3 py-1 text-ink-300"
-                    style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+                    className="font-mono text-xs px-3 py-1.5 text-ink-300 tracking-wide"
+                    style={{
+                      border: '1px solid rgba(0,255,65,0.12)',
+                      background: 'rgba(0,255,65,0.03)',
+                    }}
                   >
                     {s}
                   </span>
@@ -122,17 +141,21 @@ export default function ProjectPanel({ project, onClose }: Props) {
               </div>
             </motion.div>
 
-            {/* GitHub link */}
+            {/* CTA */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.38, duration: 0.4 }}
+              transition={{ delay: 0.34, duration: 0.4 }}
             >
               <a
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-signal text-ink-950 font-semibold px-5 py-2.5 text-sm tracking-wide hover:opacity-90 transition-opacity"
+                className="inline-flex items-center gap-3 font-mono font-semibold text-sm tracking-widest px-6 py-3 transition-all hover:gap-4"
+                style={{
+                  background: '#00FF41',
+                  color: '#060606',
+                }}
               >
                 VIEW ON GITHUB <span>↗</span>
               </a>

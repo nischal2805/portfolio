@@ -5,8 +5,9 @@ import { useTyping } from '../hooks/useTyping';
 const PHRASES = [
   'AI / ML Engineer',
   'LLM Systems Builder',
-  'Computer Vision Dev',
   'Deep Learning Researcher',
+  'Distributed Inference Dev',
+  'Neural Architecture Designer',
 ];
 
 export default function Hero() {

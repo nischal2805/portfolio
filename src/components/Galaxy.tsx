@@ -8,10 +8,10 @@ import { projects } from '../data/projects';
 import PodMesh from './PodMesh';
 import ProjectPanel from './ProjectPanel';
 
-// Constellation wiring between pods
+// Constellation wiring for 8 pods
 const CONNECTION_PAIRS = [
-  [0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6],
-  [5, 7], [6, 8], [7, 9], [8, 1], [0, 5], [1, 6], [3, 9],
+  [0, 1], [0, 2], [1, 2], [0, 3], [1, 4],
+  [2, 5], [3, 6], [4, 7], [5, 7], [3, 5], [4, 6],
 ];
 
 function ConstellationLines({ dimmed }: { dimmed: boolean }) {
@@ -19,16 +19,17 @@ function ConstellationLines({ dimmed }: { dimmed: boolean }) {
     <>
       {CONNECTION_PAIRS.map(([a, b], i) => {
         if (a >= projects.length || b >= projects.length) return null;
-        const pa = projects[a].position;
-        const pb = projects[b].position;
         return (
           <Line
             key={i}
-            points={[new THREE.Vector3(...pa), new THREE.Vector3(...pb)]}
+            points={[
+              new THREE.Vector3(...projects[a].position),
+              new THREE.Vector3(...projects[b].position),
+            ]}
             color="#00FF41"
-            lineWidth={0.35}
+            lineWidth={0.3}
             transparent
-            opacity={dimmed ? 0.05 : 0.1}
+            opacity={dimmed ? 0.04 : 0.08}
           />
         );
       })}
@@ -36,19 +37,39 @@ function ConstellationLines({ dimmed }: { dimmed: boolean }) {
   );
 }
 
+// Stark HUD — radar sweep ring
+function RadarSweep() {
+  const ringRef = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (!ringRef.current) return;
+    const cycle = (state.clock.elapsedTime * 0.18) % 1;
+    const r = cycle * 14;
+    ringRef.current.scale.setScalar(r < 0.1 ? 0.01 : r);
+    const mat = ringRef.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = r < 0.5 ? 0 : Math.max(0, 0.12 * (1 - cycle));
+  });
+  return (
+    <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[0.94, 1, 64]} />
+      <meshBasicMaterial color="#00FF41" transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+// Ambient green breathing sphere
 function AmbientPulse() {
   const meshRef = useRef<THREE.Mesh>(null);
   useFrame((state) => {
     if (!meshRef.current) return;
     const t = state.clock.elapsedTime;
-    meshRef.current.scale.setScalar(1 + Math.sin(t * 0.4) * 0.06);
+    meshRef.current.scale.setScalar(1 + Math.sin(t * 0.35) * 0.05);
     (meshRef.current.material as THREE.MeshBasicMaterial).opacity =
-      0.018 + Math.sin(t * 0.4) * 0.006;
+      0.016 + Math.sin(t * 0.35) * 0.005;
   });
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[7, 24, 24]} />
-      <meshBasicMaterial color="#00FF41" transparent opacity={0.018} side={THREE.BackSide} depthWrite={false} />
+      <sphereGeometry args={[8, 24, 24]} />
+      <meshBasicMaterial color="#00FF41" transparent opacity={0.016} side={THREE.BackSide} depthWrite={false} />
     </mesh>
   );
 }
@@ -56,24 +77,18 @@ function AmbientPulse() {
 export default function Galaxy() {
   const [selected, setSelected] = useState<Project | null>(null);
 
-  const handleClick = (p: Project) => {
-    setSelected(prev => (prev?.id === p.id ? null : p));
-  };
-
   return (
     <section id="lab" className="relative w-full" style={{ height: '100vh' }}>
-      {/* Section label */}
+      {/* HUD label */}
       <div className="absolute top-8 left-8 z-10 pointer-events-none">
         <p className="font-mono text-xs text-signal tracking-widest mb-1">// PROJECT LAB</p>
         <p className="text-ink-500 text-xs font-mono">Drag to orbit · Click a pod to expand</p>
       </div>
-
-      {/* Pod count */}
       <div className="absolute top-8 right-8 z-10 pointer-events-none text-right">
-        <p className="font-mono text-xs text-ink-500">{projects.length} systems</p>
+        <p className="font-mono text-xs text-ink-600 tracking-widest">{projects.length} SYSTEMS ONLINE</p>
       </div>
 
-      {/* Canvas — zoom disabled so wheel scrolls the page */}
+      {/* Canvas — zoom disabled; wheel scrolls the page */}
       <Canvas
         camera={{ position: [0, 1.5, 11], fov: 55 }}
         gl={{ antialias: true, alpha: true }}
@@ -81,27 +96,21 @@ export default function Galaxy() {
         onPointerMissed={() => setSelected(null)}
       >
         <ambientLight intensity={0.04} />
-        <pointLight position={[0, 0, 0]} color="#00FF41" intensity={0.25} distance={14} />
+        <pointLight position={[0, 0, 0]} color="#00FF41" intensity={0.2} distance={16} />
 
         <Suspense fallback={null}>
-          <Sparkles
-            count={280}
-            scale={[22, 12, 18]}
-            size={0.7}
-            speed={0.12}
-            color="#00FF41"
-            opacity={0.2}
-          />
-
+          <Sparkles count={300} scale={[24, 13, 20]} size={0.6} speed={0.1} color="#00FF41" opacity={0.18} />
           <AmbientPulse />
+          <RadarSweep />
           <ConstellationLines dimmed={!!selected} />
 
           {projects.map(p => (
             <PodMesh
               key={p.id}
               project={p}
-              onClick={handleClick}
+              onClick={proj => setSelected(prev => prev?.id === proj.id ? null : proj)}
               selected={selected?.id === p.id}
+              dimmed={!!selected && selected.id !== p.id}
             />
           ))}
         </Suspense>
@@ -116,14 +125,14 @@ export default function Galaxy() {
         />
       </Canvas>
 
-      {/* Project detail panel (has its own backdrop) */}
+      {/* Project detail panel */}
       <AnimatePresence>
         {selected && (
           <ProjectPanel project={selected} onClose={() => setSelected(null)} />
         )}
       </AnimatePresence>
 
-      {/* Bottom fade to next section */}
+      {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-ink-950 to-transparent pointer-events-none z-10" />
 
       {/* Scroll hint */}
